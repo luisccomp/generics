@@ -165,6 +165,29 @@ int list_get(list *l, int pos, void **item) {
 }
 
 /**
+ * Remove the first element of a list;
+ * @param l: a linked list;
+ * @param item: a pointer to a variable to store the removed item;
+ * @return: function error code.
+ */
+int list_pop(list *l, void **item) {
+    if (l == NULL)
+        return LIST_NULL_PTR;
+
+    if (l->first == NULL)
+        return LIST_EMPTY;
+
+    node *curr = l->first;
+    l->assign(*item, curr->item);
+    l->first = curr->next;
+    free(curr->item);
+    free(curr);
+    -- l->size;
+
+    return SUCCESS;
+}
+
+/**
  * Insert a new item on the top of the list.
  * @param l: a linked list;
  * @param item: an item to be inserted;

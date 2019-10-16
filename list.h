@@ -6,6 +6,7 @@
 #define LIST_NULL_PTR -1
 #define LIST_OUT_OF_MEM -2
 #define LIST_OUT_OF_INDEX -3
+#define LIST_EMPTY -4
 
 typedef struct list list;
 
@@ -58,6 +59,14 @@ int list_empty(list *l);
  * @return: the function error code.
  */
 int list_get(list *l, int pos, void **item);
+
+/**
+ * Remove the first element of a list;
+ * @param l: a linked list;
+ * @param item: a pointer to a variable to store the removed item;
+ * @return: function error code.
+ */
+int list_pop(list *l, void **item);
 
 /**
  * Insert a new item on the top of the list.
