@@ -1,14 +1,15 @@
 #include <stdlib.h>
 #include "list.h"
 
-
 typedef struct node node;
 
 struct list {
-    void (*assign)(void *, void *);
-    int (*compare)(void *, void *);
+    void (*assign) (void *, void *);
+    int (*cmp) (void *, void *);
+    size_t elem_size;
     int size;
-    node *head;
+    node *first;
+    node *last;
 };
 
 struct node {
@@ -16,152 +17,201 @@ struct node {
     node *next;
 };
 
-
-int list_append(list *l, void *item, size_t size) {
-    // Return NULL POINTER error code
+/**
+ * Insert an item at the end of the list.
+ * @param l: a linked list;
+ * @param item: an item to be inserted;
+ * @return: an error code indicating if insertion is successful or not.
+ */
+int list_append(list *l, void *item) {
     if (l == NULL)
-        return -1;
+        return LIST_NULL_PTR;
 
     node *n = (node *) malloc(sizeof(struct node));
 
-    // Return OUT OF MEMORY error code
     if (n == NULL)
-        return -2;
+        return LIST_OUT_OF_MEM;
 
-    n->item = malloc(size);
+    n->item = malloc(l->elem_size);
 
-    // Also return OUT OF MEMORY error code
-    if (n->item == NULL)
-        return -2;
+    if (n->item == NULL) {
+        free(n);
+        return LIST_OUT_OF_MEM;
+    }
 
     l->assign(n->item, item);
 
-    if (l->head == NULL) {
-        n->next = l->head;
-        l->head = n;
+    if (l->first == NULL) {
+        n->next = NULL;
+        l->first = n;
+        l->last = l->first;
     }
     else {
-        node *curr = l->head;
-
-        while (curr->next != NULL) {
-            curr = curr->next;
-        }
-
-        curr->next = n;
+        l->last->next = n;
+        l->last = n;
         n->next = NULL;
     }
 
     ++ l->size;
 
-    // Return SUCCESS code
+    return SUCCESS;
+}
+
+/**
+ * Check if list contains or not a given element.
+ * @param l: a linked list;
+ * @param item: an item;
+ * @return: an error code or a idication if list contains or not the given element.
+ */
+int list_contains(list *l, void *item) {
+    if (l == NULL)
+        return LIST_NULL_PTR;
+
+    node *curr = l->first;
+
+    while (curr != NULL) {
+        // Means the element exists on the list
+        if (l->cmp(curr->item, item) == 0)
+            return 1;
+    }
+
     return 0;
 }
 
-
-list *list_create(void (*assign)(void *, void *), int (*compare)(void *, void *)) {
+/**
+ * Create a new and empyt list and return a pointer to a memory address where
+ * this list is stored.
+ * @param assign: a pointer to a function that assugign a value to a memory
+ * address;
+ * @param cmp: a pointer to a function that compare two values;
+ * @param elem_size: the size (in bytes) of every element on the list;
+ * @return: a pointer to an empty linked list or NULL if allocation fails.
+ */
+list *list_create(void (*assign)(void *, void *), int (*cmp)(void *, void *), size_t elem_size) {
     list *l = (list *) malloc(sizeof(struct list));
 
     if (l != NULL) {
         l->assign = assign;
-        l->compare = compare;
+        l->cmp = cmp;
+        l->elem_size = elem_size;
         l->size = 0;
-        l->head = NULL;
+        l->first = NULL;
+        l->last = NULL;
     }
 
     return l;
 }
 
+/**
+ * Destroy the linked list and its stored elements. After destroy everything,
+ * this function will assign NULL to the pointer for futher uses.
+ * @param l: a pointer to a linked list address.
+ */
+void list_destroy(list **pl) {
+    list *l = *pl;
 
-void list_destroy(list *l) {
-    if (l == NULL) {
-        node *curr = l->head;
+    if (l != NULL) {
+        node *curr = l->first;
 
         while (curr != NULL) {
             node *prev = curr;
             curr = curr->next;
-            // Destroy node and its content
             free(prev->item);
             free(prev);
         }
 
-        // Destroy the list itself
         free(l);
+        *pl = NULL;
     }
 }
 
-
-void list_get(list *l, int pos, void **item) {
-    // Return NULL POINTER error code
+/**
+ * Checks if a list is empty or not.
+ * @param l: a linked list;
+ * @return: an error code or an indication if list is empty or not.
+ */
+int list_empty(list *l) {
     if (l == NULL)
-        return -1;
+        return LIST_NULL_PTR;
 
-    // Return OUT OF INDEX error code
+    return (l->first == NULL);
+}
+
+/**
+ * Get an especific element on a given position inside the list.
+ * @param l: a linked list;
+ * @param pos: the position of element;
+ * @param item: a pointer to a variable where you want to store the given item;
+ * @return: the function error code.
+ */
+int list_get(list *l, int pos, void **item) {
+    if (l == NULL)
+        return LIST_NULL_PTR;
+
     if (pos >= l->size)
-        return -3;
+        return LIST_OUT_OF_INDEX;
 
     int i = 0;
-    node *curr = l->head;
+    node *curr = l->first;
 
-    while (i != pos) {
+    while (i < pos) {
         ++ i;
         curr = curr->next;
     }
 
     l->assign(*item, curr->item);
 
-    return 0;
+    return SUCCESS;
 }
 
-
-int list_pop(list *l, void **item) {
-    // Return NULL POINTER error
+/**
+ * Insert a new item on the top of the list.
+ * @param l: a linked list;
+ * @param item: an item to be inserted;
+ * @return: return an error code indicating if operation was successful or not.
+ */
+int list_push(list *l, void *item) {
     if (l == NULL)
-        return -1;
-
-    // Return EMPTY LIST error
-    if (l->head == NULL)
-        return -4;
-
-    node *curr = l->head;
-    l->head = curr->next;
-    l->assign(*item, curr->item);
-    free(curr->item);
-    free(curr);
-    -- l->size;
-
-    return 0;
-}
-
-
-int list_push(list *l, void *item, size_t size) {
-    // Return NULL pointer error code
-    if (l == NULL)
-        return -1;
+        return LIST_NULL_PTR;
 
     node *n = (node *) malloc(sizeof(struct node));
 
-    // Return OUT OF MEMORY error code
     if (n == NULL)
-        return -2;
+        return LIST_OUT_OF_MEM;
 
-    n->item = malloc(size);
+    n->item = malloc(l->elem_size);
 
-    // Also return OUT OF MEMORY error code
-    if (n->item == NULL)
-        return -2;
+    if (n->item == NULL) {
+        free(n);
+        return LIST_OUT_OF_MEM;
+    }
 
     l->assign(n->item, item);
-    n->next = l->head;
-    l->head = n;
+
+    // Check if list is empty or not
+    if (l->first == NULL) {
+        l->first = n;
+        l->last = l->first;
+        n->next = NULL;
+    }
+    else {
+        n->next = l->first;
+        l->first = n;
+    }
+
     ++ l->size;
 
-    return 0;
+    return SUCCESS;
 }
 
-
+/**
+ * Count the number of elements the current list contains.
+ * @param l: a linked list;
+ * @return: an error code or the size of the list.
+ */
 int list_size(list *l) {
     if (l == NULL)
-        return -1;
+        return LIST_NULL_PTR;
 
     return l->size;
 }
