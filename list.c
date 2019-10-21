@@ -57,7 +57,7 @@ int list_append(list *l, void *item) {
     }
 
     ++ l->size;
-    
+
     return 0;
 }
 
@@ -127,6 +127,18 @@ int list_get(list *l, int pos, void *item) {
         return LIST_COPY_ERROR;
 
     return 0;
+}
+
+/**
+ * Checks if the list is empty or not.
+ * @param l: a linked list.
+ * @return: an error code or the answer.
+ */
+int list_is_empty(list *l) {
+    if (l == NULL)
+        return LIST_NULL_PTR;
+
+    return l->head == NULL;
 }
 
 /**

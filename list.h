@@ -47,6 +47,13 @@ void list_destroy(list **l_ptr);
 int list_get(list *l, int pos, void *item);
 
 /**
+ * Checks if the list is empty or not.
+ * @param l: a linked list.
+ * @return: an error code or the answer.
+ */
+int list_is_empty(list *l);
+
+/**
  * Remove an element from the top of the list.
  * @param l: a linked list;
  * @param item: an address to store the removed item;
