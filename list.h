@@ -1,13 +1,25 @@
 #ifndef LIST_H
 #define LIST_H
 
+// Some error codes defined here
 #define LIST_NULL_PTR      -1
 #define LIST_OUT_OF_MEMORY -2
 #define LIST_COPY_ERROR    -3
 #define LIST_INDEX_ERROR   -4
 #define LIST_NOT_FOUND     -5
+#define LIST_EMPTY         -6
+#define LIST_NULL_CMP_FUN  -7 // If the pointer "compare" is NULL, some functions 
+                              // won't work. Instead, they'll return this error code.
 
 typedef struct list list;
+
+/**
+ * Insert an item at the end of the list.
+ * @param l: a linked list;
+ * @param item: an item to be inserted;
+ * @return: an error code.
+ */
+int list_append(list *l, void *item);
 
 /**
  * Create an empty list and return the memory address where the list descriptor is.
@@ -33,6 +45,14 @@ void list_destroy(list **l_ptr);
  * @return: an error code.
  */
 int list_get(list *l, int pos, void *item);
+
+/**
+ * Remove an element from the top of the list.
+ * @param l: a linked list;
+ * @param item: an address to store the removed item;
+ * @return: an error code.
+ */
+int list_pop(list *l, void *item);
 
 /**
  * Insert an element at the top of the list.

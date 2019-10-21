@@ -18,6 +18,48 @@ struct node {
 };
 
 /**
+ * Insert an item at the end of the list.
+ * @param l: a linked list;
+ * @param item: an item to be inserted;
+ * @return: an error code.
+ */
+int list_append(list *l, void *item) {
+    if (l == NULL)
+        return LIST_NULL_PTR;
+
+    node *n = (node *) malloc(sizeof(struct node));
+
+    if (n == NULL)
+        return LIST_OUT_OF_MEMORY;
+
+    n->item = malloc(l->elem_size);
+
+    if (n->item == NULL) {
+        free(n);
+        return LIST_OUT_OF_MEMORY;
+    }
+
+    if (memcpy(n->item, item, l->elem_size) != n->item) {
+        free(n->item);
+        free(n);
+        return LIST_COPY_ERROR;
+    }
+
+    if (l->head == NULL) {
+        l->head = n;
+        l->last = n;
+        n->next = NULL;
+    }
+    else {
+        l->last->next = n;
+        l->last = n;
+        n->next = NULL;
+    }
+
+    return 0;
+}
+
+/**
  * Create an empty list and return the memory address where the list descriptor is.
  * If allocation tails, return a NULL pointer instead.
  * @param compare: a function that compare two elements on the list;
@@ -81,6 +123,32 @@ int list_get(list *l, int pos, void *item) {
 
     if (memcpy(item, curr->item, l->elem_size) != item)
         return LIST_COPY_ERROR;
+
+    return 0;
+}
+
+/**
+ * Remove an element from the top of the list.
+ * @param l: a linked list;
+ * @param item: an address to store the removed item;
+ * @return: an error code.
+ */
+int list_pop(list *l, void *item) {
+    if (l == NULL)
+        return LIST_NULL_PTR;
+
+    if (l->head == NULL)
+        return LIST_EMPTY;
+
+    node *curr = l->head;
+
+    if (memcpy(item, curr->item, l->elem_size) != item)
+        return LIST_COPY_ERROR;
+
+    l->head = curr->next;
+    free(curr->item);
+    free(curr);
+    -- l->size;
 
     return 0;
 }
@@ -182,6 +250,9 @@ int list_remove_item(list *l, void *item) {
     if (l == NULL)
         return LIST_NULL_PTR;
 
+    if (l->compare == NULL)
+        return LIST_NULL_CMP_FUN;
+
     node *prev = NULL;
     node *curr = l->head;
 
@@ -191,9 +262,16 @@ int list_remove_item(list *l, void *item) {
     }
 
     if (curr != NULL) {
-        prev->next = curr->next;
-        free(curr->item);
-        free(curr);
+        if (curr == l->head) {
+            l->head = curr->next;
+            free(curr->item);
+            free(curr);
+        }
+        else {
+            prev->next = curr->next;
+            free(curr->item);
+            free(curr);
+        }
     }
     else {
         return LIST_NOT_FOUND;

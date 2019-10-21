@@ -65,6 +65,17 @@ int main(int argc, char **argv) {
                 }
 
                 break;
+            case 4:
+                printf("Type the element you want to be removed: ");
+                int element;
+                scanf("%d", &element);
+
+                if (list_remove_item(l, (void *) &element))
+                    printf("ERROR\n");
+                else
+                    printf("Element removed successfully\n");
+
+                break;
             case 0:
                 printf("Exiting...\n");
                 break;
