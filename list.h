@@ -1,85 +1,51 @@
 #ifndef LIST_H
 #define LIST_H
 
-// Some error codes
-#define SUCCESS 0
-#define LIST_NULL_PTR -1
-#define LIST_OUT_OF_MEM -2
-#define LIST_OUT_OF_INDEX -3
-#define LIST_EMPTY -4
+#define LIST_NULL_PTR      -1
+#define LIST_OUT_OF_MEMORY -2
+#define LIST_COPY_ERROR    -3
+#define LIST_INDEX_ERROR   -4
 
 typedef struct list list;
 
 /**
- * Insert an item at the end of the list.
- * @param l: a linked list;
- * @param item: an item to be inserted;
- * @return: an error code indicating if insertion is successful or not.
+ * Create an empty list and return the memory address where the list descriptor is.
+ * If allocation tails, return a NULL pointer instead.
+ * @param compare: a function that compare two elements on the list;
+ * @param elem_size: the size of each element stored on the list;
+ * @return: a memory address where the list descriptor is.
  */
-int list_append(list *l, void *item);
+list *list_create(int (*compare)(void *, void *), size_t elem_size);
 
 /**
- * Check if list contains or not a given element.
- * @param l: a linked list;
- * @param item: an item;
- * @return: an error code or a idication if list contains or not the given element.
+ * Destroy the linked list and every element stored on it. Also assign NULL as list's
+ * memory address.
+ * @param l_ptr: a pointer to a memory addres where the list descriptor is.
  */
-int list_contains(list *l, void *item);
+void list_destroy(list **l_ptr);
 
 /**
- * Create a new and empyt list and return a pointer to a memory address where
- * this list is stored.
- * @param assign: a pointer to a function that assugign a value to a memory
- * address;
- * @param cmp: a pointer to a function that compare two values;
- * @param elem_size: the size (in bytes) of every element on the list;
- * @return: a pointer to an empty linked list or NULL if allocation fails.
- */
-list *list_create(void (*assign)(void *, void *), int (*cmp)(void *, void *), size_t elem_size);
-
-/**
- * Destroy the linked list and its stored elements. After destroy everything,
- * this function will assign NULL to the pointer for futher uses.
- * @param l: a pointer to a linked list address.
- */
-void list_destroy(list **pl);
-
-/**
- * Checks if a list is empty or not.
- * @param l: a linked list;
- * @return: an error code or an indication if list is empty or not.
- */
-int list_empty(list *l);
-
-/**
- * Get an especific element on a given position inside the list.
+ * Get an element of a given position on the list.
  * @param l: a linked list;
  * @param pos: the position of element;
- * @param item: a pointer to a variable where you want to store the given item;
- * @return: the function error code.
+ * @param item: an address to a variable where the returned item will be stored;
+ * @return: an error code.
  */
-int list_get(list *l, int pos, void **item);
+int list_get(list *l, int pos, void *item);
 
 /**
- * Remove the first element of a list;
- * @param l: a linked list;
- * @param item: a pointer to a variable to store the removed item;
- * @return: function error code.
- */
-int list_pop(list *l, void **item);
-
-/**
- * Insert a new item on the top of the list.
+ * Insert an element at the top of the list.
  * @param l: a linked list;
  * @param item: an item to be inserted;
- * @return: return an error code indicating if operation was successful or not.
+ * @return: an error code.
  */
 int list_push(list *l, void *item);
 
 /**
- * Count the number of elements the current list contains.
+ * Count how many elements was inserted on the list until the present moment.
  * @param l: a linked list;
- * @return: an error code or the size of the list.
+ * @return: the list size or an error code.
  */
 int list_size(list *l);
+
 #endif // LIST_H
