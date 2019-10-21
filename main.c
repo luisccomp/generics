@@ -33,9 +33,13 @@ int main(int argc, char **argv) {
         printf("2. Insert an element at the top;\n");
         printf("3. Remove an element by position;\n");
         printf("4. Remove an element;\n");
+        printf("5. Insert an item at the end of list;\n");
+        printf("6. Remove an element from the top;\n");
         printf("0. Exit.\n");
         printf("> ");
         scanf("%d", &option);
+
+        int item, element, removed;
 
         switch (option) {
             case 1:
@@ -43,7 +47,6 @@ int main(int argc, char **argv) {
                 break;
             case 2:
                 printf("Type an element: ");
-                int item;
                 scanf("%d", &item);
                 
                 if (list_push(l, (void *) &item))
@@ -56,7 +59,6 @@ int main(int argc, char **argv) {
                 printf("Enter the position of element: ");
                 int pos;
                 scanf("%d", &pos);
-                int removed;
 
                 if (list_remove(l, pos, (void *) &removed))
                     printf("ERROR\n");
@@ -67,7 +69,6 @@ int main(int argc, char **argv) {
                 break;
             case 4:
                 printf("Type the element you want to be removed: ");
-                int element;
                 scanf("%d", &element);
 
                 if (list_remove_item(l, (void *) &element))
@@ -75,6 +76,23 @@ int main(int argc, char **argv) {
                 else
                     printf("Element removed successfully\n");
 
+                break;
+            case 5:
+                printf("The the element you want to be inserted: ");
+                scanf("%d", &item);
+
+                if (list_append(l, (void *) &item))
+                    printf("ERROR\n");
+                else
+                    printf("Inserted successfully\n");
+
+                break;
+            case 6:
+                if (list_pop(l, (void *) &element))
+                    printf("ERROR\n");
+                else
+                    printf("Removed: %d\n", element);
+                    
                 break;
             case 0:
                 printf("Exiting...\n");

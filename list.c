@@ -56,6 +56,8 @@ int list_append(list *l, void *item) {
         n->next = NULL;
     }
 
+    ++ l->size;
+    
     return 0;
 }
 
@@ -149,6 +151,15 @@ int list_pop(list *l, void *item) {
     free(curr->item);
     free(curr);
     -- l->size;
+
+    /*int error_code = list_remove(l, 0, item);
+    
+    switch(error_code) {
+        case LIST_INDEX_ERROR:
+            return LIST_EMPTY;
+        default:
+            return error_code;
+    }*/
 
     return 0;
 }
