@@ -31,6 +31,8 @@ int main(int argc, char **argv) {
         printf("Select an option:\n");
         printf("1. Show list;\n");
         printf("2. Insert an element at the top;\n");
+        printf("3. Remove an element by position;\n");
+        printf("4. Remove an element;\n");
         printf("0. Exit.\n");
         printf("> ");
         scanf("%d", &option);
@@ -48,6 +50,19 @@ int main(int argc, char **argv) {
                     printf("ERROR\n");
                 else
                     printf("Inserted successfuly\n");
+
+                break;
+            case 3:
+                printf("Enter the position of element: ");
+                int pos;
+                scanf("%d", &pos);
+                int removed;
+
+                if (list_remove(l, pos, (void *) &removed))
+                    printf("ERROR\n");
+                else {
+                    printf("Removed: %d\n", removed);
+                }
 
                 break;
             case 0:

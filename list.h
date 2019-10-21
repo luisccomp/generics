@@ -5,6 +5,7 @@
 #define LIST_OUT_OF_MEMORY -2
 #define LIST_COPY_ERROR    -3
 #define LIST_INDEX_ERROR   -4
+#define LIST_NOT_FOUND     -5
 
 typedef struct list list;
 
@@ -40,6 +41,23 @@ int list_get(list *l, int pos, void *item);
  * @return: an error code.
  */
 int list_push(list *l, void *item);
+
+/**
+ * Remove an item from a given position on the list.
+ * @param l: a linked list;
+ * @param pos: a position of an item to be removed;
+ * @param item: an address of a variable to store the removed item;
+ * @return: an error code.
+ */
+int list_remove(list *l, int pos, void *item);
+
+/**
+ * Remove an specific item from the list.
+ * @param l: a linked list;
+ * @param item: an item to be removed;
+ * @return: an error code.
+ */
+int list_remove_item(list *l, void *item);
 
 /**
  * Count how many elements was inserted on the list until the present moment.

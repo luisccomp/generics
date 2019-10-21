@@ -131,6 +131,80 @@ int list_push(list *l, void *item) {
 }
 
 /**
+ * Remove an item from a given position on the list.
+ * @param l: a linked list;
+ * @param pos: a position of an item to be removed;
+ * @param item: an address of a variable to store the removed item;
+ * @return: an error code.
+ */
+int list_remove(list *l, int pos, void *item) {
+    if (l == NULL)
+        return LIST_NULL_PTR;
+
+    if (pos < 0 || pos >= l->size)
+        return LIST_INDEX_ERROR;
+
+    int i = 0;
+    node *prev = NULL;
+    node *curr = l->head;
+
+    while (i ++ != pos) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    if (memcpy(item, curr->item, l->elem_size) != item)
+        return LIST_COPY_ERROR;
+
+    if (curr == l->head) {
+        l->head = curr->next;
+        free(curr->item);
+        free(curr);
+    }
+    else {
+        prev->next = curr->next;
+        free(curr->item);
+        free(curr);
+    }
+
+    -- l->size;
+
+    return 0;
+}
+
+/**
+ * Remove an specific item from the list.
+ * @param l: a linked list;
+ * @param item: an item to be removed;
+ * @return: an error code.
+ */
+int list_remove_item(list *l, void *item) {
+    if (l == NULL)
+        return LIST_NULL_PTR;
+
+    node *prev = NULL;
+    node *curr = l->head;
+
+    while (curr != NULL && l->compare(curr->item, item) != 0) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    if (curr != NULL) {
+        prev->next = curr->next;
+        free(curr->item);
+        free(curr);
+    }
+    else {
+        return LIST_NOT_FOUND;
+    }
+
+    -- l->size;
+
+    return 0;
+}
+
+/**
  * Count how many elements was inserted on the list until the present moment.
  * @param l: a linked list;
  * @return: the list size or an error code.
